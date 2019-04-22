@@ -1,0 +1,49 @@
+[Package]
+version: 1
+depends: 
+incremental: False
+
+[Product]
+type: localboot
+id: ica-anti-theft
+name: Prey Anti-Theft
+description: Prey Anti-Theft
+advice: 
+
+
+version: 1.8.2
+priority: 0
+licenseRequired: False
+productClasses: 
+setupScript: setup.opsiscript
+uninstallScript: uninstall.opsiscript
+updateScript: 
+alwaysScript: 
+onceScript: 
+customScript: 
+userLoginScript: 
+
+[ProductProperty]
+type: unicode
+name: install_mode
+multivalue: False
+editable: False
+description: Install mode
+values: ["copy files only", "full install"]
+default: ["full install"]
+
+[ProductProperty]
+type: unicode
+name: apikey
+multivalue: False
+editable: True
+description: API KEY needed to link to Prey server
+values: [""]
+default: [""]
+
+[Changelog]
+ica-anti-theft (1.8.2-1) stable; urgency=low
+
+	* initial: created by opsi-setup-detector
+
+ -- opsisetupdetector.exe <info@uib.de>  12/2/2018 17:27:21

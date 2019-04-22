@@ -1,0 +1,110 @@
+; ----------------------------------------------------------------
+; Copyright (c) uib gmbh (www.uib.de)
+; This sourcecode is owned by uib
+; and published under the Terms of the General Public License.
+; credits: http://www.opsi.org/en/credits/
+; ----------------------------------------------------------------
+
+;****************************************
+; SETUPTYPE      msi
+;****************************************
+; PRODUCTID      ica-anti-theft
+; SETUPFILE      prey-windows-1.8.2-x86.msi
+;****************************************
+; LICENSE        false     
+; PRODUCTDESC    Prey Anti-Theft
+
+; PRODUCTNAME    Prey Anti-Theft
+; PRODUCTSIZE    138 MB
+; PRODUCTVER     1.8.2
+;****************************************
+; SETUPSCRIPT    setup.opsiscript
+; UNINSSCRIPT    uninstall.opsiscript
+;****************************************
+; MSIID          {C4993E70-8DE2-4121-8D78-48A126D5EDE6}
+; USE-MST        
+; INSTALLDIR     (not used)
+;****************************************
+; TIMESTAMP      12/2/2018 17:27:21
+;****************************************
+
+[Actions]
+requiredWinstVersion >= "4.11.4.3"
+ScriptErrorMessages = false
+
+DefVar $SetupType$
+DefVar $ProductId$ 
+DefVar $Setupfile$ 
+DefVar $InstallDir$
+DefVar $MinimumSpace$
+DefVar $ExitCode$
+DefVar $ErrorMsg$
+DefVar $LicenseRequired$
+DefVar $LicenseKey$
+DefVar $LicensePool$
+DefVar $MsiId$
+DefVar $NsisInstallBatch$
+
+DefVar $PROP_licensekey$
+DefVar $PROP_installmode$
+DefVar $MsiId2$
+
+set $PROP_licensekey$ = GetProductProperty("api_key","493e732f3892")
+set $PROP_installmode$ = GetProductProperty("install_mode","full install")
+
+DefVar $LogDir$
+
+Set $LogDir$ = "%opsiLogDir%"
+
+include_append "%ScriptPath%\check_msi_exitcode.opsiscript"
+
+; ----------------------------------------------------------------
+Set $SetupType$       = "msi"
+; ----------------------------------------------------------------
+
+; $ProductId$ is the name of the product in opsi, only lower letters, no umlauts, no white spaces, use '-' as a seperator
+Set $ProductId$       = "ica-anti-theft"
+Set $Setupfile$       = "prey-windows-1.8.2-x86.msi"
+; the path where we find the product after the installation
+Set $InstallDir$      = "(not used)"
+Set $LicenseRequired$ = "false"
+Set $LicensePool$     = "p_" + $ProductId$
+Set $MsiId$           = "{C4993E70-8DE2-4121-8D78-48A126D5EDE6}"
+Set $MinimumSpace$    = "138 MB"
+; ----------------------------------------------------------------
+; ----------------------------------------------------------------
+
+if not(HasMinimumSpace ("%SystemDrive%", $MinimumSpace$))
+   LogError "Not enough space on %SystemDrive%, " + $MinimumSpace$ + " on drive %SystemDrive% needed for " + $ProductId$
+   isFatalError "No Space"
+   ; Stop process and set installation status to failed
+else
+   comment "Show product picture"
+   ShowBitmap "%ScriptPath%\" + $ProductId$ + ".png" $ProductId$
+
+   if FileExists("%ScriptPath%\delsub.opsiscript")
+      comment "Start uninstall sub section"
+      Sub "%ScriptPath%\delsub.opsiscript"
+   endif
+   
+   Message "Installing " + $ProductId$ + " ..."
+     
+   comment "Start setup program"
+   ChangeDirectory "%SCRIPTPATH%"
+   ;----------------------------------------------
+   Winbatch_install_msi
+   ;----------------------------------------------
+   Sub_check_exitcode	
+endif
+
+
+; ----------------------------------------------------------------
+; install section
+; ----------------------------------------------------------------
+
+[Winbatch_install_msi]
+msiexec /i "%ScriptPath%\prey-windows-1.8.2-x86.msi"  /lvx "$LogDir$\$ProductId$.install_log.txt" /qb! API_KEY="$PROP_licensekey$"
+;msiexec /i "%ScriptPath%\prey-windows-1.8.2-x86.msi"  /lvx "$LogDir$\$ProductId$.install_log.txt" /qb! API_KEY=493e732f3892
+
+; ----------------------------------------------------------------
+
